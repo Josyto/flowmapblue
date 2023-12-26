@@ -1,10 +1,23 @@
-import {createSelector, createSelectorCreator, defaultMemoize, ParametricSelector} from 'reselect';
+import * as Cluster from '@flowmap.gl/cluster';
+import {ClusterNode, findAppropriateZoomLevel, isCluster} from '@flowmap.gl/cluster';
+import {bounds} from '@mapbox/geo-viewport';
+import {descending, min} from 'd3-array';
+import {nest} from 'd3-collection';
+import {csvParseRows} from 'd3-dsv';
+import KDBush from 'kdbush';
+import {ParametricSelector, createSelector, createSelectorCreator, defaultMemoize} from 'reselect';
+import {Props} from './FlowMap';
 import {LocationFilterMode, MAX_ZOOM_LEVEL, State} from './FlowMap.state';
+import getColors from './colors';
+import {DEFAULT_MAP_STYLE_DARK, DEFAULT_MAP_STYLE_LIGHT} from './config';
+import {TimeGranularity, getTimeGranularityByOrder, getTimeGranularityForDate} from './time';
 import {
   Config,
   ConfigPropName,
   CountByTime,
   Flow,
+  Location,
+  LocationTotals,
   getFlowDestId,
   getFlowMagnitude,
   getFlowOriginId,
@@ -12,22 +25,9 @@ import {
   getLocationCentroid,
   getLocationId,
   isLocationCluster,
-  Location,
-  LocationTotals,
 } from './types';
-import * as Cluster from '@flowmap.gl/cluster';
-import {ClusterNode, findAppropriateZoomLevel, isCluster} from '@flowmap.gl/cluster';
-import getColors from './colors';
-import {DEFAULT_MAP_STYLE_DARK, DEFAULT_MAP_STYLE_LIGHT, parseBoolConfigProp} from './config';
-import {nest} from 'd3-collection';
-import {Props} from './FlowMap';
-import {bounds} from '@mapbox/geo-viewport';
-import KDBush from 'kdbush';
-import {descending, min} from 'd3-array';
-import {csvParseRows} from 'd3-dsv';
-import {getTimeGranularityByOrder, getTimeGranularityForDate, TimeGranularity} from './time';
 
-export const NUMBER_OF_FLOWS_TO_DISPLAY = 500000;
+export const NUMBER_OF_FLOWS_TO_DISPLAY = 5000;
 
 export type Selector<T> = ParametricSelector<State, Props, T>;
 

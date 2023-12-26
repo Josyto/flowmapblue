@@ -1,6 +1,10 @@
-import React, {FC, useEffect} from 'react';
+import sendEvent from 'components/sendEvent';
+import {csvParse} from 'd3-dsv';
+import {useRouter} from 'next/router';
+import {FC, useEffect, useMemo} from 'react';
 import useFetch from 'react-fetch-hook';
 import {PromiseState} from 'react-refetch';
+import ErrorFallback from '../components/ErrorFallback';
 import FlowMap, {
   ConfigPropName,
   DEFAULT_CONFIG,
@@ -8,11 +12,6 @@ import FlowMap, {
   MapContainer,
   prepareFlows,
 } from '../core';
-import {csvParse} from 'd3-dsv';
-import ErrorFallback from '../components/ErrorFallback';
-import {useMemo} from 'react';
-import {useRouter} from 'next/router';
-import sendEvent from 'components/sendEvent';
 
 type Props = {
   locationsUrl: string;
@@ -73,7 +72,6 @@ const FromUrlFlowMap: FC<Props> = (props) => {
   return (
     <MapContainer>
       <FlowMap
-        inBrowser={true}
         flowsSheet={undefined}
         flowsFetch={PromiseState.resolve(prepareFlows(fetchFlows.data as any[]))}
         locationsFetch={PromiseState.resolve(fetchLocations.data)}

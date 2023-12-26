@@ -1,13 +1,15 @@
-import React, {useState} from 'react';
-import styled from '@emotion/styled';
 import {Button, H5, Intent, TextArea} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
-import {dsvFormat} from 'd3-dsv';
-import FlowMap, {DEFAULT_CONFIG, Flow, Location, MapContainer, prepareFlows} from '../core';
-import {PromiseState} from 'react-refetch';
-import Layout from '../core/Layout';
-import {useRouter} from 'next/router';
+import styled from '@emotion/styled';
 import md5 from 'blueimp-md5';
+import {dsvFormat} from 'd3-dsv';
+import {FLOWS} from 'data/flows';
+import {LOCATIONS} from 'data/locations';
+import {useRouter} from 'next/router';
+import {useState} from 'react';
+import {PromiseState} from 'react-refetch';
+import FlowMap, {DEFAULT_CONFIG, Flow, Location, MapContainer, prepareFlows} from '../core';
+import Layout from '../core/Layout';
 
 interface DataProps {
   locations: Location[];
@@ -19,7 +21,6 @@ const FlowMapContainer = (props: DataProps) => {
   return (
     <MapContainer>
       <FlowMap
-        inBrowser={true}
         flowsFetch={PromiseState.resolve(flows)}
         locationsFetch={PromiseState.resolve(locations)}
         config={DEFAULT_CONFIG}
@@ -51,21 +52,8 @@ const Container = styled.div`
 `;
 
 const InBrowserFlowMap = () => {
-  const [locationsCsv, setLocationsCsv] = useState(
-    `id,name,lat,lon
-1,New York,40.713543,-74.011219
-2,London,51.507425,-0.127738
-3,Rio de Janeiro,-22.906241,-43.180244`,
-  );
-  const [flowsCsv, setFlowsCsv] = useState(
-    `origin,dest,count
-1,2,42
-2,1,51
-3,1,50
-2,3,40
-1,3,22
-3,2,42`,
-  );
+  const [locationsCsv, setLocationsCsv] = useState(LOCATIONS);
+  const [flowsCsv, setFlowsCsv] = useState(FLOWS);
   const router = useRouter();
   const {hash} = router.query;
   const [data, setData] = useState<DataProps>();

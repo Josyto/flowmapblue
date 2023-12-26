@@ -1,6 +1,5 @@
-import {Html, Head, Main, NextScript} from 'next/document';
+import {Head, Html, Main, NextScript} from 'next/document';
 import manifest from '../public/manifest.json';
-import * as React from 'react';
 const fontUrl = 'https://fonts.googleapis.com/css?family=Sarabun:200,400,700&display=swap';
 
 export default function Document() {

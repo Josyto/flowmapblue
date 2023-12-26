@@ -1,4 +1,8 @@
 import type {Colors, DiffColors} from '@flowmap.gl/core';
+import {range} from 'd3-array';
+import {color as d3color, hcl} from 'd3-color';
+import {interpolateRgbBasis} from 'd3-interpolate';
+import {scalePow, scaleSequential} from 'd3-scale';
 import {
   interpolateCool,
   interpolateInferno,
@@ -12,8 +16,8 @@ import {
   schemeGnBu,
   schemeGreens,
   schemeGreys,
-  schemeOranges,
   schemeOrRd,
+  schemeOranges,
   schemePuBu,
   schemePuBuGn,
   schemePuRd,
@@ -25,11 +29,7 @@ import {
   schemeYlOrBr,
   schemeYlOrRd,
 } from 'd3-scale-chromatic';
-import {range} from 'd3-array';
-import {scalePow, scaleSequential} from 'd3-scale';
-import {interpolateRgbBasis} from 'd3-interpolate';
 import {Config} from './types';
-import {color as d3color, hcl} from 'd3-color';
 
 const asScheme = (scheme: ReadonlyArray<ReadonlyArray<string>>) =>
   scheme[scheme.length - 1] as string[];

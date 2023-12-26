@@ -1,14 +1,14 @@
 import {Classes, Intent, MenuItem} from '@blueprintjs/core';
 import {ItemPredicate, ItemRenderer} from '@blueprintjs/select';
+import styled from '@emotion/styled';
+import {Cluster} from '@flowmap.gl/cluster';
 import {nest} from 'd3-collection';
 import React from 'react';
 import {defaultMemoize} from 'reselect';
-import {matchesSearchQuery} from './matchesSearchQuery';
-import SearchBox from './SearchBox';
-import {Location} from './types';
-import styled from '@emotion/styled';
-import {Cluster} from '@flowmap.gl/cluster';
 import {LocationFilterMode} from './FlowMap.state';
+import SearchBox from './SearchBox';
+import {matchesSearchQuery} from './matchesSearchQuery';
+import {Location} from './types';
 
 export interface Props {
   selectedLocations: string[] | undefined;
@@ -119,7 +119,7 @@ class LocationsSearchBox extends React.PureComponent<Props> {
         <SearchBox<Location | Cluster>
           placeholder="Filter by origin and destination…"
           items={unselected}
-          selectedItems={selected}
+          selectedItems={selected ?? []}
           maxItems={100}
           itemPredicate={itemPredicate}
           itemRenderer={this.itemRenderer}
