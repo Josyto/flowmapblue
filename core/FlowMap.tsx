@@ -424,14 +424,17 @@ const FlowMap: FC<Props> = (props) => {
       layers.push(
         new FlowMapLayer({
           id: 'flow-map',
+          locations,
+          flows,
+          visible: true,
+          pickable: true,
+          showTotals: true,
+          showOnlyTopFlows: NUMBER_OF_FLOWS_TO_DISPLAY,
           animate: animationEnabled,
           animationCurrentTime: time,
           diffMode: getDiffMode(state, props),
           colors: getFlowMapColors(state, props),
-          locations,
-          flows,
           getFlowColor: (f: Flow) => f.color ?? undefined,
-          showOnlyTopFlows: NUMBER_OF_FLOWS_TO_DISPLAY,
           getLocationCentroid,
           getFlowMagnitude,
           getFlowOriginId,
@@ -443,7 +446,6 @@ const FlowMap: FC<Props> = (props) => {
           getAnimatedFlowLineStaggering: (d: Flow) =>
             // @ts-ignore
             new alea(`${d.origin}-${d.dest}`)(),
-          showTotals: true,
           maxLocationCircleSize: getMaxLocationCircleSize(state, props),
           maxFlowThickness: animationEnabled ? 18 : 12,
           ...(!adaptiveScalesEnabled && {
@@ -459,26 +461,22 @@ const FlowMap: FC<Props> = (props) => {
               : undefined,
           highlightedFlow:
             highlight && highlight.type === HighlightType.FLOW ? highlight.flow : undefined,
-          pickable: true,
-          ...{
-            onHover: handleHover,
-            onClick: (
-              info: FlowLayerPickingInfo,
-              event: {
-                srcEvent: MouseEvent;
-              },
-            ) => handleClick(info, event, selectLocationAction),
-          },
-          visible: true,
-          updateTriggers: {
-            onHover: handleHover, // to avoid stale closure in the handler
-            onClick: (
-              info: FlowLayerPickingInfo,
-              event: {
-                srcEvent: MouseEvent;
-              },
-            ) => handleClick(info, event, selectLocationAction),
-          } as any,
+          onHover: handleHover,
+          onClick: (
+            info: FlowLayerPickingInfo,
+            event: {
+              srcEvent: MouseEvent;
+            },
+          ) => handleClick(info, event, selectLocationAction),
+          // updateTriggers: {
+          //   onHover: handleHover, // to avoid stale closure in the handler
+          //   onClick: (
+          //     info: FlowLayerPickingInfo,
+          //     event: {
+          //       srcEvent: MouseEvent;
+          //     },
+          //   ) => handleClick(info, event, selectLocationAction),
+          // } as any,
         }),
       );
     }
