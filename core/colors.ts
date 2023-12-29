@@ -29,7 +29,6 @@ import {
   schemeYlOrBr,
   schemeYlOrRd,
 } from 'd3-scale-chromatic';
-import {Config} from './types';
 
 const asScheme = (scheme: ReadonlyArray<ReadonlyArray<string>>) =>
   scheme[scheme.length - 1] as string[];
@@ -119,25 +118,24 @@ const diffColors: DiffColors = {
 };
 
 export default function getColors(
-  config: Config,
-  diffMode: boolean,
+  // config: Config,
+  // diffMode: boolean,
   schemeKey: string | undefined,
-  darkMode: boolean,
+  // darkMode: boolean,
   fadeEnabled: boolean,
   fadeAmount: number,
   animate: boolean,
 ): Colors | DiffColors {
-  if (diffMode) {
-    return diffColors;
-  }
+  // if (diffMode) {
+  //   return diffColors;
+  // }
 
   let scheme = (schemeKey && COLOR_SCHEMES[schemeKey]) || DEFAULT_COLOR_SCHEME;
 
-  if (darkMode) {
-    scheme = scheme.slice().reverse();
-  }
-  // if (animate)
-  // if (fadeAmount > 0)
+  // if (darkMode) {
+  scheme = scheme.slice().reverse();
+  // }
+
   {
     const indices = range(0, Math.max(10, scheme.length));
     const N = indices.length - 1;
@@ -147,32 +145,20 @@ export default function getColors(
       scheme = indices.map((c, i) => colorScale(i)!);
     } else {
       const amount = scalePow()
-        // .exponent(animate ? 1 : 1/2.5)
-        // .exponent(animate ? 100 : 50)
-        // .exponent(animate ? 20 : 5)
-        // .exponent(1/2.5)
         .exponent(1.5)
         .domain([N, 0])
-        // .range([fadeAmount/100*(animate?2:1), 0])
-        // .range([0, fadeAmount/100*(animate?2:1)])
-        // .range(darkMode ? [1-fadeAmount/100, 1] : [1, 1 - fadeAmount/100])
-        // .range(darkMode ? [1 - fadeAmount/100, 1] : [fadeAmount/100, 0])
-        // .range([1 - fadeAmount/100, 1])
         .range([0, ((animate ? 2.5 : 2) * fadeAmount) / 100]);
 
-      scheme = indices.map(
-        (c, i) => {
-          const color = colorScale(i);
-          const alpha = amount(i);
-          if (color == null || alpha == null) return '#000';
-          const col = hcl(color);
-          col.l = darkMode ? col.l - col.l * alpha : col.l + (100 - col.l) * alpha;
-          col.c = col.c - col.c * (alpha / 4);
-          return col.toString();
-        },
-        // interpolateRgbBasis([colorScale(i), darkMode ? '#000' : '#fff'])(amount(i))
-        // interpolateHsl(colorScale(i), darkMode ? '#000' : '#fff')(amount(i)).toString()
-      );
+      scheme = indices.map((c, i) => {
+        const color = colorScale(i);
+        const alpha = amount(i);
+        if (color == null || alpha == null) return '#000';
+        const col = hcl(color);
+        col.l = col.l - col.l * alpha;
+        // col.l = darkMode ? col.l - col.l * alpha : col.l + (100 - col.l) * alpha;
+        col.c = col.c - col.c * (alpha / 4);
+        return col.toString();
+      });
     }
   }
 
@@ -181,9 +167,11 @@ export default function getColors(
       scheme,
     },
     locationCircles: {
-      outgoing: darkMode ? '#000' : '#fff',
+      // outgoing: darkMode ? '#000' : '#fff',
+      outgoing: '#000',
     },
-    outlineColor: darkMode ? '#000' : 'rgba(255, 255, 255, 0.5)',
+    // outlineColor: darkMode ? '#000' : 'rgba(255, 255, 255, 0.5)',
+    outlineColor: '#000',
   };
 }
 

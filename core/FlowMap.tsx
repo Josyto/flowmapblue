@@ -1,6 +1,6 @@
 import {Button, ButtonGroup, Classes, Colors} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
-import {MapController, MapView} from '@deck.gl/core';
+import {MapController} from '@deck.gl/core';
 import {DeckGL} from '@deck.gl/react';
 import styled from '@emotion/styled';
 import {findAppropriateZoomLevel} from '@flowmap.gl/cluster';
@@ -10,43 +10,32 @@ import FlowMapLayer, {
   LocationPickingInfo,
   PickingType,
 } from '@flowmap.gl/core';
-import {getViewStateForLocations} from '@flowmap.gl/react';
 import WebMercatorViewport from '@math.gl/web-mercator';
 import {FC, ReactNode, useCallback, useEffect, useRef, useState} from 'react';
-import {_MapContext as MapContext, StaticMap} from 'react-map-gl';
+import {StaticMap} from 'react-map-gl';
 import {alea} from 'seedrandom';
-import {Absolute, BoxStyle, Column} from './Boxes';
+import {Absolute, Column} from './Boxes';
 import {
   NUMBER_OF_FLOWS_TO_DISPLAY,
   getAvailableClusterZoomLevels,
   getClusterIndex,
   getClusterZoom,
   getDarkMode,
-  getDiffMode,
-  getFlowMagnitudeExtent,
   getFlowMapColors,
   getFlowsForFlowMapLayer,
   getLocationTotals,
   getLocationTotalsExtent,
-  getLocations,
   getLocationsForFlowMapLayer,
-  getLocationsForSearchBox,
-  getLocationsHavingFlows,
   getMaxLocationCircleSize,
 } from './FlowMap.selectors';
 import {
   HighlightType,
-  LocationFilterMode,
-  MAX_PITCH,
   MAX_ZOOM_LEVEL,
-  MIN_PITCH,
   MIN_ZOOM_LEVEL,
   State,
-  mapTransition,
   useFlowmapState,
 } from './FlowMap.state';
 import LoadingSpinner from './LoadingSpinner';
-import LocationsSearchBox from './LocationSearchBox';
 import Message from './Message';
 import NoScrollContainer from './NoScrollContainer';
 import SettingsPopover from './SettingsPopover';
@@ -106,7 +95,6 @@ export const MAX_NUM_OF_IDS_IN_ERROR = 100;
 
 const FlowMap: FC<Props> = (props) => {
   const {embed, config, spreadSheetKey, locationsFetch, flowsFetch} = props;
-  const deckRef = useRef<any>();
 
   const outerRef = useRef<HTMLDivElement>(null);
   const {
@@ -137,8 +125,9 @@ const FlowMap: FC<Props> = (props) => {
   } = useFlowmapState(config);
 
   const {viewport, tooltip, animationEnabled, baseMapEnabled} = state;
-  const allLocations = getLocations(state, props);
-  const locationsHavingFlows = getLocationsHavingFlows(state, props);
+
+  // const allLocations = getLocations(state, props);
+  // const locationsHavingFlows = getLocationsHavingFlows(state, props);
   const locations = getLocationsForFlowMapLayer(state, props);
   const flows = getFlowsForFlowMapLayer(state, props);
 
@@ -179,47 +168,47 @@ const FlowMap: FC<Props> = (props) => {
 
   const {adjustViewportToLocations} = state;
 
-  useEffect(() => {
-    if (!adjustViewportToLocations) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (!adjustViewportToLocations) {
+  //     return;
+  //   }
 
-    const width = globalThis.innerWidth;
-    const height = globalThis.innerHeight;
-    if (allLocations != null) {
-      let draft = getViewStateForLocations(
-        locationsHavingFlows ?? allLocations,
-        getLocationCentroid,
-        [width, height],
-        {pad: 0.1},
-      );
+  //   const width = globalThis.innerWidth;
+  //   const height = globalThis.innerHeight;
+  //   if (allLocations != null) {
+  //     let draft = getViewStateForLocations(
+  //       locationsHavingFlows ?? allLocations,
+  //       getLocationCentroid,
+  //       [width, height],
+  //       {pad: 0.1},
+  //     );
 
-      if (!draft.zoom) {
-        draft = {
-          zoom: 1,
-          latitude: 0,
-          longitude: 0,
-        };
-      }
+  //     if (!draft.zoom) {
+  //       draft = {
+  //         zoom: 1,
+  //         latitude: 0,
+  //         longitude: 0,
+  //       };
+  //     }
 
-      setViewportAction(
-        {
-          width,
-          height,
-          ...draft,
-          minZoom: MIN_ZOOM_LEVEL,
-          maxZoom: MAX_ZOOM_LEVEL,
-          minPitch: MIN_PITCH,
-          maxPitch: MAX_PITCH,
-          bearing: 0,
-          pitch: 0,
-          altitude: 1.5,
-          ...mapTransition(500),
-        },
-        false,
-      );
-    }
-  }, [allLocations, locationsHavingFlows, adjustViewportToLocations, setViewportAction]);
+  //     setViewportAction(
+  //       {
+  //         width,
+  //         height,
+  //         ...draft,
+  //         minZoom: MIN_ZOOM_LEVEL,
+  //         maxZoom: MAX_ZOOM_LEVEL,
+  //         minPitch: MIN_PITCH,
+  //         maxPitch: MAX_PITCH,
+  //         bearing: 0,
+  //         pitch: 0,
+  //         altitude: 1.5,
+  //         ...mapTransition(500),
+  //       },
+  //       false,
+  //     );
+  //   }
+  // }, [allLocations, locationsHavingFlows, adjustViewportToLocations, setViewportAction]);
 
   const clusterIndex = getClusterIndex(state, props);
 
@@ -410,14 +399,14 @@ const FlowMap: FC<Props> = (props) => {
     );
   }
 
-  const searchBoxLocations = getLocationsForSearchBox(state, props);
+  // const searchBoxLocations = getLocationsForSearchBox(state, props);
   const mapboxAccessToken = config[ConfigPropName.MAPBOX_ACCESS_TOKEN];
   const darkMode = getDarkMode(state, props);
 
   const getLayers = () => {
     const {animationEnabled, adaptiveScalesEnabled} = state;
     const layers = [];
-
+    console.log(locations, flows);
     if (locations && flows) {
       const locationTotals = getLocationTotals(state, props);
       const highlight = getHighlightForZoom(state, props);
@@ -432,7 +421,7 @@ const FlowMap: FC<Props> = (props) => {
           showOnlyTopFlows: NUMBER_OF_FLOWS_TO_DISPLAY,
           animate: animationEnabled,
           animationCurrentTime: time,
-          diffMode: getDiffMode(state, props),
+          // diffMode: getDiffMode(state, props),
           colors: getFlowMapColors(state, props),
           getFlowColor: (f: Flow) => f.color ?? undefined,
           getLocationCentroid,
@@ -448,9 +437,9 @@ const FlowMap: FC<Props> = (props) => {
             new alea(`${d.origin}-${d.dest}`)(),
           maxLocationCircleSize: getMaxLocationCircleSize(state, props),
           maxFlowThickness: animationEnabled ? 18 : 12,
-          ...(!adaptiveScalesEnabled && {
-            flowMagnitudeExtent: getFlowMagnitudeExtent(state, props),
-          }),
+          // ...(!adaptiveScalesEnabled && {
+          //   flowMagnitudeExtent: getFlowMagnitudeExtent(state, props),
+          // }),
           // locationTotalsExtent needs to be always calculated, because locations
           // are not filtered by the viewport (e.g. the connected ones need to be included).
           // Also, the totals cannot be correctly calculated from the flows passed to the layer.
@@ -499,13 +488,10 @@ const FlowMap: FC<Props> = (props) => {
         cursor={undefined}
       >
         <DeckGL
-          ref={deckRef}
           controller={CONTROLLER_OPTIONS}
           viewState={viewport}
-          views={[new MapView({id: 'map', repeat: true})]}
           onViewStateChange={(props: any) => setViewStateAction(props)}
           layers={getLayers()}
-          ContextProvider={MapContext.Provider}
           parameters={{
             clearColor: darkMode ? [0, 0, 0, 1] : [255, 255, 255, 1],
           }}
@@ -521,7 +507,7 @@ const FlowMap: FC<Props> = (props) => {
       </DeckGLOuter>
       {flows && (
         <>
-          {searchBoxLocations && (
+          {/* {searchBoxLocations && (
             <Absolute top={10} right={50}>
               <BoxStyle darkMode={darkMode}>
                 <LocationsSearchBox
@@ -537,7 +523,7 @@ const FlowMap: FC<Props> = (props) => {
                 />
               </BoxStyle>
             </Absolute>
-          )}
+          )} */}
           <Absolute top={10} right={10}>
             <Column spacing={10}>
               <ButtonGroup vertical={true}>
